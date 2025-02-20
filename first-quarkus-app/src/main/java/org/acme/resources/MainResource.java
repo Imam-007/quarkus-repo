@@ -5,4 +5,9 @@ import jakarta.ws.rs.Path;
 
 @Path("/main")
 public class MainResource {
+
+    @GET
+    public String getName(){
+        return "i am imam";
+    }
 }
