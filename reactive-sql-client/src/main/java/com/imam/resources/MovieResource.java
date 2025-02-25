@@ -39,4 +39,11 @@ public class MovieResource {
     public Uni<Response> deleteMovie(@PathParam("id") Long id){
         return movieService.delete(id);
     }
+
+    @PATCH
+    @Path("/{id}")
+    public Uni<Response> patchUpdateMovie(@PathParam("id") Long id, MovieDTO movie) {
+        return movieService.patchUpdate(id, movie.getName());
+    }
+
 }

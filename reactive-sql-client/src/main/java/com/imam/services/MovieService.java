@@ -14,4 +14,7 @@ public interface MovieService {
     public Uni<Response> save(String name);
 
     public Uni<Response> delete(Long id);
+
+    public Uni<Response> patchUpdate(Long id, String name);
+
 }

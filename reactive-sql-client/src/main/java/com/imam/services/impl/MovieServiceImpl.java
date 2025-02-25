@@ -49,4 +49,12 @@ public class MovieServiceImpl implements MovieService {
                 .onItem()
                 .transform(status -> Response.status(status).build());
     }
+
+    @Override
+    public Uni<Response> patchUpdate(Long id, String name) {
+        return MovieDAO.update(client, id, name)
+                .onItem()
+                .transform(updated -> updated ? Response.ok().build() : Response.status(Response.Status.NOT_FOUND).build());
+    }
+
 }

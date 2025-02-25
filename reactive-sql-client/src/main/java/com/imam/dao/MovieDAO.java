@@ -54,4 +54,13 @@ public class MovieDAO {
                 .onItem()
                 .transform(row -> row.rowCount() == 1);
     }
+
+    public static Uni<Boolean> update(PgPool client, Long id, String name) {
+        return client
+                .preparedQuery("UPDATE movies SET name = $1 WHERE id = $2")
+                .execute(Tuple.of(name, id))
+                .onItem()
+                .transform(row -> row.rowCount() == 1);
+    }
+
 }
