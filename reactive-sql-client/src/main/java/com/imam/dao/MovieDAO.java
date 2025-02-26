@@ -63,4 +63,17 @@ public class MovieDAO {
                 .transform(row -> row.rowCount() == 1);
     }
 
+    public static Multi<MovieDTO> searchByName(PgPool client, String name) {
+        return client.preparedQuery("SELECT id, name FROM movies WHERE name ILIKE $1")
+                .execute(Tuple.of("%" + name + "%"))
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(MovieDTO::from);
+    }
+
+    public static Uni<Long> count(PgPool client) {
+        return client.query("SELECT COUNT(*) FROM movies")
+                .execute()
+                .onItem()
+                .transform(m -> m.iterator().next().getLong(0));
+    }
 }

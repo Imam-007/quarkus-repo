@@ -57,4 +57,13 @@ public class MovieServiceImpl implements MovieService {
                 .transform(updated -> updated ? Response.ok().build() : Response.status(Response.Status.NOT_FOUND).build());
     }
 
+    @Override
+    public Multi<MovieDTO> searchMovies(String name) {
+        return MovieDAO.searchByName(client, name);
+    }
+
+    @Override
+    public Uni<Long> getMovieCount() {
+        return MovieDAO.count(client);
+    }
 }

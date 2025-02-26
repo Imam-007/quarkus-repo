@@ -7,6 +7,7 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/movies")
@@ -46,4 +47,17 @@ public class MovieResource {
         return movieService.patchUpdate(id, movie.getName());
     }
 
+    @GET
+    @Path("/search")
+    public Multi<MovieDTO> getMoviesByName(@QueryParam("name") String name) {
+        return movieService.searchMovies(name);
+    }
+
+    @GET
+    @Path("/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Response> getMovieCount() {
+        return movieService.getMovieCount()
+                .onItem().transform(count -> Response.ok(count).build());
+    }
 }

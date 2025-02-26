@@ -17,4 +17,7 @@ public interface MovieService {
 
     public Uni<Response> patchUpdate(Long id, String name);
 
+    public Multi<MovieDTO> searchMovies(String name);
+
+    public Uni<Long> getMovieCount();
 }
