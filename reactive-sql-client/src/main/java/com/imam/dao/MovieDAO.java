@@ -76,4 +76,11 @@ public class MovieDAO {
                 .onItem()
                 .transform(m -> m.iterator().next().getLong(0));
     }
+
+    public static Multi<MovieDTO> findRecentMovies(PgPool client) {
+        return client.query("SELECT id, name FROM movies ORDER BY id DESC LIMIT 1")
+                .execute()
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(MovieDTO::from);
+    }
 }

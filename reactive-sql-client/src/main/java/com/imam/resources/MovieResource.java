@@ -4,7 +4,6 @@ import com.imam.dto.MovieDTO;
 import com.imam.services.MovieService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.pgclient.PgPool;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -12,9 +11,6 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/movies")
 public class MovieResource {
-
-    @Inject
-    PgPool client;
 
     @Inject
     MovieService movieService;
@@ -56,8 +52,13 @@ public class MovieResource {
     @GET
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> getMovieCount() {
-        return movieService.getMovieCount()
-                .onItem().transform(count -> Response.ok(count).build());
+    public Uni<Long> getMovieCount() {
+        return movieService.getMovieCount();
+    }
+
+    @GET
+    @Path("/recent")
+    public Multi<MovieDTO> getRecentMovies() {
+        return movieService.getRecentMovies();
     }
 }
