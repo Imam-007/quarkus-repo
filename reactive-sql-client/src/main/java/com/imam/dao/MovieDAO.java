@@ -71,11 +71,21 @@ public class MovieDAO {
     }
 
     public static Uni<Long> count(PgPool client) {
-        return client.query("SELECT COUNT(*) FROM movies")
+        LOGGER.info("Executing count query...");
+        return client.query("SELECT COUNT(*) AS total FROM movies")
                 .execute()
                 .onItem()
-                .transform(m -> m.iterator().next().getLong(0));
+                .transform(m -> {
+                    if (m.iterator().hasNext()) {
+                        return m.iterator().next().getLong("total");
+                    } else {
+                        return 0L;
+                    }
+                })
+                .onFailure()
+                .invoke(ex -> LOGGER.error("Error executing count query", ex)); // Log errors
     }
+
 
     public static Multi<MovieDTO> findRecentMovies(PgPool client) {
         return client.query("SELECT id, name FROM movies ORDER BY id DESC LIMIT 1")
