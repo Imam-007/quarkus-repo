@@ -50,6 +50,13 @@ public class MovieResource {
     }
 
     @GET
+    @Path("/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Long> getMovieCount() {
+        return movieService.getMovieCount();
+    }
+
+    @GET
     @Path("/recent")
     public Multi<MovieDTO> getRecentMovies() {
         return movieService.getRecentMovies();

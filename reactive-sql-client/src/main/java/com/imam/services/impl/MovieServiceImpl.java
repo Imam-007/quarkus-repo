@@ -63,6 +63,11 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    public Uni<Long> getMovieCount() {
+        return MovieDAO.count(client);
+    }
+
+    @Override
     public Multi<MovieDTO> getRecentMovies() {
         return MovieDAO.findRecentMovies(client);
     }
