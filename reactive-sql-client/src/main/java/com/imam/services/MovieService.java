@@ -19,7 +19,5 @@ public interface MovieService {
 
     public Multi<MovieDTO> searchMovies(String name);
 
-    public Uni<Long> getMovieCount();
-
     public Multi<MovieDTO> getRecentMovies();
 }
