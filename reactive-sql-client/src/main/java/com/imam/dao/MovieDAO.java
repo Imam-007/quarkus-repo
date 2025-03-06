@@ -3,14 +3,14 @@ package com.imam.dao;
 import com.imam.dto.MovieDTO;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Tuple;
 import org.jboss.logging.Logger;
 
 public class MovieDAO {
     private static final Logger LOGGER = Logger.getLogger(MovieDAO.class);
 
-    public static Multi<MovieDTO> findAllMovies(PgPool client) {
+    public static Multi<MovieDTO> findAllMovies(MySQLPool client) {
         String sql = "SELECT id, name FROM movies ORDER BY name DESC";
         LOGGER.info("Executing SQL: " + sql);
 
@@ -31,7 +31,7 @@ public class MovieDAO {
                 .invoke(ex -> LOGGER.error("Error executing query: " + sql, ex));
     }
 
-    public static Uni<MovieDTO> findById(PgPool client, Long id) {
+    public static Uni<MovieDTO> findById(MySQLPool client, Long id) {
         return client
                 .preparedQuery("SELECT id, name FROM movies WHERE id = $1")
                 .execute(Tuple.of(id))
@@ -39,7 +39,7 @@ public class MovieDAO {
                 .transform(m -> m.iterator().hasNext() ? MovieDTO.from(m.iterator().next()) : null);
     }
 
-    public static Uni<Long> save(PgPool client, String name){
+    public static Uni<Long> save(MySQLPool client, String name){
         return client
                 .preparedQuery("INSERT INTO movies (name) VALUES ($1) RETURNING id")
                 .execute(Tuple.of(name))
@@ -47,7 +47,7 @@ public class MovieDAO {
                 .transform(m -> m.iterator().next().getLong("id"));
     }
 
-    public static Uni<Boolean> delete(PgPool client, Long id){
+    public static Uni<Boolean> delete(MySQLPool client, Long id){
         return client
                 .preparedQuery("DELETE FROM movies WHERE id = $1")
                 .execute(Tuple.of(id))
@@ -55,7 +55,7 @@ public class MovieDAO {
                 .transform(row -> row.rowCount() == 1);
     }
 
-    public static Uni<Boolean> update(PgPool client, Long id, String name) {
+    public static Uni<Boolean> update(MySQLPool client, Long id, String name) {
         return client
                 .preparedQuery("UPDATE movies SET name = $1 WHERE id = $2")
                 .execute(Tuple.of(name, id))
@@ -63,14 +63,14 @@ public class MovieDAO {
                 .transform(row -> row.rowCount() == 1);
     }
 
-    public static Multi<MovieDTO> searchByName(PgPool client, String name) {
+    public static Multi<MovieDTO> searchByName(MySQLPool client, String name) {
         return client.preparedQuery("SELECT id, name FROM movies WHERE name ILIKE $1")
                 .execute(Tuple.of("%" + name + "%"))
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(MovieDTO::from);
     }
 
-    public static Uni<Long> count(PgPool client) {
+    public static Uni<Long> count(MySQLPool client) {
         LOGGER.info("Executing count query...");
         return client.query("SELECT COUNT(*) AS total FROM movies")
                 .execute()
@@ -86,7 +86,7 @@ public class MovieDAO {
                 .invoke(ex -> LOGGER.error("Error executing count query", ex));
     }
 
-    public static Multi<MovieDTO> findRecentMovies(PgPool client) {
+    public static Multi<MovieDTO> findRecentMovies(MySQLPool client) {
         return client.query("SELECT id, name FROM movies ORDER BY id DESC LIMIT 1")
                 .execute()
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))

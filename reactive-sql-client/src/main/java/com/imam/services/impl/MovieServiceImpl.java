@@ -5,7 +5,7 @@ import com.imam.dto.MovieDTO;
 import com.imam.services.MovieService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.mysqlclient.MySQLPool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -16,7 +16,7 @@ import java.net.URI;
 public class MovieServiceImpl implements MovieService {
 
     @Inject
-    PgPool client;
+    MySQLPool client;
 
     @Override
     public Multi<MovieDTO> findAllMovies() {
@@ -26,17 +26,16 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public Uni<Response> findById(Long id) {
         return MovieDAO.findById(client, id)
-                .onItem()
-                .transform(movie -> movie != null ? Response.ok(movie) : Response.status(Response.Status.NOT_FOUND))
-                .onItem()
-                .transform(Response.ResponseBuilder::build);
+                .onItem().transform(movie -> movie != null ?
+                        Response.ok(movie).build() :
+                        Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @Override
     public Uni<Response> save(String name) {
         return MovieDAO.save(client, name)
                 .onItem()
-                .transform(id -> URI.create("/movies/"+ id))
+                .transform(id -> URI.create("/movies/" + id))
                 .onItem()
                 .transform(uri -> Response.created(uri).build());
     }
@@ -45,16 +44,18 @@ public class MovieServiceImpl implements MovieService {
     public Uni<Response> delete(Long id) {
         return MovieDAO.delete(client, id)
                 .onItem()
-                .transform(deleted -> deleted ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
-                .onItem()
-                .transform(status -> Response.status(status).build());
+                .transform(deleted -> deleted ?
+                        Response.status(Response.Status.NO_CONTENT).build() :
+                        Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @Override
     public Uni<Response> patchUpdate(Long id, String name) {
         return MovieDAO.update(client, id, name)
                 .onItem()
-                .transform(updated -> updated ? Response.ok().build() : Response.status(Response.Status.NOT_FOUND).build());
+                .transform(updated -> updated ?
+                        Response.ok().build() :
+                        Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @Override
